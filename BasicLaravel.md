@@ -11,7 +11,7 @@ We need to set up a quick database so we can do all of our CRUD functionality. I
 php artisan make:migration create_students_table --table=students --create
 ```
 
-This will create our shark migration in `app/database/migrations`. Open up that file and let’s add name, email, and shark_level fields.
+This will create our student migration in `app/database/migrations`. Open up that file and let’s add name, email, and student_level fields.
 
 
 **app/database/migrations/####_##_##_######_create_students_table.php**
@@ -54,3 +54,27 @@ class CreatestudentTable extends Migration {
 
 }
 ```
+
+Now from the command line again, let’s run this migration. Make sure your database settings are good in `app/config/database`.php and then run:
+```console
+php artisan migrate
+```
+Our database now has a students table to house all of the students we CRUD (create, read, update, and delete). Read more about migrations at the [Laravel docs](https://laravel.com/docs/8.x/migrations).
+
+
+### Eloquent Model for the students
+
+Now that we have our database, let’s create a simple Eloquent model so that we can access the students in our database easily. You can read about Eloquent ORM and see how you can use it in your own applications.
+
+In the app/models folder, let’s create a student.php model.
+
+** app/models/Student.php
+```php
+<?php
+
+    class Student extends Eloquent
+    {
+
+    }
+```
+
