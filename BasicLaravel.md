@@ -13,7 +13,8 @@ php artisan make:migration create_students_table --table=students --create
 
 This will create our shark migration in `app/database/migrations`. Open up that file and let’s add name, email, and shark_level fields.
 
-> app/database/migrations/####_##_##_######_create_students_table.php
+
+**app/database/migrations/####_##_##_######_create_students_table.php**
 ```php
 <?php
 
