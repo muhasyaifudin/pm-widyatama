@@ -173,3 +173,33 @@ class StudentController extends BaseController {
 }
 
 ```
+
+### Setting Up the Routes
+
+Now that we have generated our controller, let’s make sure our application has the routes necessary to use it. This is the other easy part (they actually might all be easy parts). In your `routes.php` file, add this line:
+
+**app/routes.php**
+```php
+<?php
+
+    Route::resource('sharks', 'sharkController');
+
+```
+
+This will automatically assign many actions to that resource controller. Now if you, go to your browser and view your application at `example.com/sharks`, it will correspond to the proper method in your sharkController.
+
+
+#### Actions Handled By the Controller
+
+HTTP | Verb	Path (URL) | Action (Method) | Route Name
+--- | --- | --- | ---
+GET | /sharks | index | sharks.index
+GET | /sharks/create | create | sharks.create
+POST | /sharks | store | sharks.store
+GET | /sharks/{id} | show | sharks.show
+GET | /sharks/{id}/edit | edit | sharks.edit
+PUT/PATCH | /sharks/{id} | update | sharks.update
+DELETE | /sharks/{id} | destroy | sharks.destroy
+
+
+Tip: From the command line, you can run `php artisan routes` to see all the routes associated with your application.
