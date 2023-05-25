@@ -232,7 +232,7 @@ In this function, we will get all the students and pass them to the view.
 ```php
 <?php
 
-...
+
 
     /**
         * Display a listing of the resource.
@@ -249,7 +249,7 @@ In this function, we will get all the students and pass them to the view.
             ->with('students', $students);
     }
     
-...
+
 
 ```
 
@@ -337,7 +337,7 @@ In this function, we will show the form for creating a new student. This form wi
 ```php
 
 <?php
-...
+
     /**
         * Show the form for creating a new resource.
         *
@@ -348,7 +348,7 @@ In this function, we will show the form for creating a new student. This form wi
         // load the create form (app/views/students/create.blade.php)
         return View::make('students.create');
     }
-...
+
 
 ```
 
@@ -421,7 +421,7 @@ To process the form, we’ll want to validate the inputs, send back error messag
 ```php
 
 <?php
-...
+
     /**
         * Store a newly created resource in storage.
         *
@@ -456,7 +456,7 @@ To process the form, we’ll want to validate the inputs, send back error messag
             return Redirect::to('students');
         }
     }
-...
+
 
 ```
 
@@ -472,7 +472,7 @@ Now you should be able to create a student and have them show up on the main pag
 
 <?php
 
-...
+
 
     /**
         * Display the specified resource.
@@ -490,7 +490,7 @@ Now you should be able to create a student and have them show up on the main pag
             ->with('student', $student);
     }
 
-...
+
 
 ```
 
@@ -545,7 +545,7 @@ To edit a student, we need to pull them from the database, show the creation for
 ```php
 <?php
 
-...
+
 
     /**
         * Show the form for editing the specified resource.
@@ -562,7 +562,7 @@ To edit a student, we need to pull them from the database, show the creation for
         return View::make('students.edit')
             ->with('student', $student);
     }
-...
+
 
 ```
 
@@ -634,7 +634,7 @@ This controller method will process the edit form. It is very similar to store()
 ```php
 <?php
 
-...
+
 
     /**
         * Update the specified resource in storage.
@@ -671,7 +671,7 @@ This controller method will process the edit form. It is very similar to store()
             return Redirect::to('students');
         }
     }
-...
+
 
 ```
 
@@ -689,7 +689,6 @@ We have to send the request to our application using the DELETE HTTP verb, so we
 
 **app/views/students/index.blade.php**
 ```html
-...
 
     @foreach($students as $key => $value)
         <tr>
@@ -717,7 +716,7 @@ We have to send the request to our application using the DELETE HTTP verb, so we
             </td>
         </tr>
     @endforeach
-    ...
+    
 
 ```
 
@@ -730,7 +729,7 @@ Now when we click that form submit button, Laravel will use the students.destroy
 
 <?php
 
-...
+
 
     /**
         * Remove the specified resource from storage.
@@ -748,7 +747,7 @@ Now when we click that form submit button, Laravel will use the students.destroy
         Session::flash('message', 'Successfully deleted the student!');
         return Redirect::to('students');
     }
-...
+
 
 ```
 
