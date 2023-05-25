@@ -59,16 +59,16 @@ Now from the command line again, let’s run this migration. Make sure your data
 ```console
 php artisan migrate
 ```
-Our database now has a students table to house all of the students we CRUD (create, read, update, and delete). Read more about migrations at the [Laravel docs](https://laravel.com/docs/8.x/migrations).
+Our database now has a students table to house all of the students we CRUD (create, read, update, and delete). Read more about migrations at the [Laravel docs](https://laravel.com/docs/10.x/migrations).
 
 
 ### Eloquent Model for the students
 
-Now that we have our database, let’s create a simple Eloquent model so that we can access the students in our database easily. You can read about Eloquent ORM and see how you can use it in your own applications.
+Now that we have our database, let’s create a simple Eloquent model so that we can access the students in our database easily. You can read about [Eloquent ORM](https://laravel.com/docs/10.x/eloquent) and see how you can use it in your own applications.
 
 In the app/models folder, let’s create a student.php model.
 
-** app/models/Student.php
+**app/models/Student.php**
 ```php
 <?php
 
@@ -76,5 +76,100 @@ In the app/models folder, let’s create a student.php model.
     {
 
     }
+    
 ```
 
+That’s it! Eloquent can handle the rest. By default, this model will link to our `students` table and we can access it later in our controllers.
+
+### Creating the Controller
+
+From the official Laravel docs, on [resource controllers](https://laravel.com/docs/10.x/controllers#resource-controllers), you can generate a resource controller using the artisan tool.
+
+Let’s go ahead and do that. This is the easy part. From the command line in the root directory of your Laravel project, type:
+
+`php artisan make:controller StudentController --resource` This will create our resource controller with all the methods we need.
+
+**app/controllers/StudentController.php**
+
+```php
+<?php
+
+class StudentController extends BaseController {
+
+    /**
+        * Display a listing of the resource.
+        *
+        * @return Response
+        */
+    public function index()
+    {
+        //
+    }
+
+    /**
+        * Show the form for creating a new resource.
+        *
+        * @return Response
+        */
+    public function create()
+    {
+        //
+    }
+
+    /**
+        * Store a newly created resource in storage.
+        *
+        * @return Response
+        */
+    public function store()
+    {
+        //
+    }
+
+    /**
+        * Display the specified resource.
+        *
+        * @param  int  $id
+        * @return Response
+        */
+    public function show($id)
+    {
+        //
+    }
+
+    /**
+        * Show the form for editing the specified resource.
+        *
+        * @param  int  $id
+        * @return Response
+        */
+    public function edit($id)
+    {
+        //
+    }
+
+    /**
+        * Update the specified resource in storage.
+        *
+        * @param  int  $id
+        * @return Response
+        */
+    public function update($id)
+    {
+        //
+    }
+
+    /**
+        * Remove the specified resource from storage.
+        *
+        * @param  int  $id
+        * @return Response
+        */
+    public function destroy($id)
+    {
+        //
+    }
+
+}
+
+```
