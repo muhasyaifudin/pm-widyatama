@@ -526,7 +526,7 @@ Now you should be able to create a student and have them show up on the main pag
         <h2>{{ $student->name }}</h2>
         <p>
             <strong>Email:</strong> {{ $student->email }}<br>
-            <strong>Level:</strong> {{ $student->student_level }}
+            <strong>Level:</strong> {{ $student->grade }}
         </p>
     </div>
 
