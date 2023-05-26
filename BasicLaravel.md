@@ -451,7 +451,7 @@ To process the form, we’ll want to validate the inputs, send back error messag
             $student = new Student;
             $student->name       = Input::get('name');
             $student->email      = Input::get('email');
-            $student->student_level = Input::get('student_level');
+            $student->grade = Input::get('student_level');
             $student->save();
 
             // redirect
