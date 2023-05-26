@@ -561,8 +561,7 @@ To edit a student, we need to pull them from the database, show the creation for
         $student = Student::find($id);
 
         // show the edit form and pass the student
-        return View::make('students.edit')
-            ->with('student', $student);
+        return view('students.edit', ['student' => $student]);
     }
 
 
