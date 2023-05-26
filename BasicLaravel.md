@@ -181,8 +181,11 @@ Now that we have generated our controller, let’s make sure our application has
 **app/routes.php**
 ```php
 <?php
+    ...
+    
+    use App\Http\Controllers\StudentController;
 
-    Route::resource('students', 'StudentController');
+    Route::resource('students', StudentController::class);
 
 ```
 
