@@ -387,17 +387,17 @@ In this function, we will show the form for creating a new student. This form wi
 
     <div class="form-group">
         {{ Form::label('name', 'Name') }}
-        {{ Form::text('name', Input::old('name'), array('class' => 'form-control')) }}
+        {{ Form::text('name', '', array('class' => 'form-control')) }}
     </div>
 
     <div class="form-group">
         {{ Form::label('email', 'Email') }}
-        {{ Form::email('email', Input::old('email'), array('class' => 'form-control')) }}
+        {{ Form::email('email', '', array('class' => 'form-control')) }}
     </div>
 
     <div class="form-group">
         {{ Form::label('student_level', 'student Level') }}
-        {{ Form::select('student_level', array('0' => 'Select a Level', '1' => 'Sees Sunlight', '2' => 'Foosball Fanatic', '3' => 'Basement Dweller'), Input::old('student_level'), array('class' => 'form-control')) }}
+        {{ Form::select('student_level', array('0' => 'Select a Level', '1' => 'Grade 1', '2' => 'Grade 2', '3' => 'Grade 3'), '', array('class' => 'form-control')) }}
     </div>
 
     {{ Form::submit('Create the student!', array('class' => 'btn btn-primary')) }}
@@ -407,6 +407,7 @@ In this function, we will show the form for creating a new student. This form wi
 </div>
 </body>
 </html>
+
 ```
 
 We will add the errors section above to show validation errors when we try to `store()` the resource. <$>[note] Tip: When using `{{ Form::open() }}`, Laravel will automatically create a hidden input field with a token to protect from cross-site request forgeries. Read more at the Laravel docs. <$>
