@@ -182,7 +182,7 @@ Now that we have generated our controller, let’s make sure our application has
 ```php
 <?php
     ...
-    
+
     use App\Http\Controllers\StudentController;
 
     Route::resource('students', StudentController::class);
@@ -248,8 +248,7 @@ In this function, we will get all the students and pass them to the view.
         $students = Student::all();
 
         // load the view and pass the students
-        return View::make('students.index')
-            ->with('students', $students);
+        return view('students.index', ['students' => $students]);
     }
     
 
