@@ -439,19 +439,19 @@ To process the form, we’ll want to validate the inputs, send back error messag
             'email'      => 'required|email',
             'student_level' => 'required|numeric'
         );
-        $validator = Validator::make(Input::all(), $rules);
+        $validator = Validator::make($request->all(), $rules);
 
         // process the login
         if ($validator->fails()) {
             return Redirect::to('students/create')
                 ->withErrors($validator)
-                ->withInput(Input::except('password'));
+                ->withInput();
         } else {
             // store
             $student = new Student;
-            $student->name       = Input::get('name');
-            $student->email      = Input::get('email');
-            $student->grade = Input::get('student_level');
+            $student->name       = $request->get('name');
+            $student->email      = $request->get('email');
+            $student->grade = $request->get('student_level');
             $student->save();
 
             // redirect
