@@ -302,7 +302,7 @@ Now let’s create our view to loop over the students and display them in a tabl
             <td>{{ $value->id }}</td>
             <td>{{ $value->name }}</td>
             <td>{{ $value->email }}</td>
-            <td>{{ $value->student_level }}</td>
+            <td>{{ $value->grade }}</td>
 
             <!-- we will also add show, edit, and delete buttons -->
             <td>
@@ -489,8 +489,7 @@ Now you should be able to create a student and have them show up on the main pag
         $student = Student::find($id);
 
         // show the view and pass the student to it
-        return View::make('students.show')
-            ->with('student', $student);
+        return view('students.show', ['student' => $student]);
     }
 
 
@@ -611,7 +610,7 @@ To edit a student, we need to pull them from the database, show the creation for
 
     <div class="form-group">
         {{ Form::label('student_level', 'student Level') }}
-        {{ Form::select('student_level', array('0' => 'Select a Level', '1' => 'Sees Sunlight', '2' => 'Foosball Fanatic', '3' => 'Basement Dweller'), null, array('class' => 'form-control')) }}
+        {{ Form::select('student_level', array('0' => 'Select a Level', '1' => 'Grade 1', '2' => 'Grade 2', '3' => 'Grade 3'), null, array('class' => 'form-control')) }}
     </div>
 
     {{ Form::submit('Edit the student!', array('class' => 'btn btn-primary')) }}
