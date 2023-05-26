@@ -348,7 +348,7 @@ In this function, we will show the form for creating a new student. This form wi
     public function create()
     {
         // load the create form (app/views/students/create.blade.php)
-        return View::make('students.create');
+        return view('students.create');
     }
 
 
