@@ -643,7 +643,7 @@ This controller method will process the edit form. It is very similar to store()
         * @param  int  $id
         * @return Response
         */
-    public function update($id)
+    public function update(Request $request, $id)
     {
         // validate
         // read more on validation at http://laravel.com/docs/validation
@@ -652,19 +652,19 @@ This controller method will process the edit form. It is very similar to store()
             'email'      => 'required|email',
             'student_level' => 'required|numeric'
         );
-        $validator = Validator::make(Input::all(), $rules);
+        $validator = Validator::make($request->all(), $rules);
 
         // process the login
         if ($validator->fails()) {
             return Redirect::to('students/' . $id . '/edit')
                 ->withErrors($validator)
-                ->withInput(Input::except('password'));
+                ->withInput();
         } else {
             // store
             $student = Student::find($id);
-            $student->name       = Input::get('name');
-            $student->email      = Input::get('email');
-            $student->student_level = Input::get('student_level');
+            $student->name       = $request->get('name');
+            $student->email      = $request->get('email');
+            $student->grade = $request->get('student_level');
             $student->save();
 
             // redirect
@@ -696,7 +696,7 @@ We have to send the request to our application using the DELETE HTTP verb, so we
             <td>{{ $value->id }}</td>
             <td>{{ $value->name }}</td>
             <td>{{ $value->email }}</td>
-            <td>{{ $value->student_level }}</td>
+            <td>{{ $value->grade }}</td>
 
             <!-- we will also add show, edit, and delete buttons -->
             <td>
