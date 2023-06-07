@@ -300,6 +300,7 @@ class User extends Authenticatable
 }
 ```
 
+##
 
 ### **`app/Http/Controllers`**
 
@@ -514,6 +515,7 @@ class SessionsController extends Controller
 }
 ```
 
+##
 
 ### **`routes`**
 
@@ -561,6 +563,7 @@ Route::post('logout', [SessionsController::class, 'destroy'])->middleware('auth'
 
 ```
 
+##
 
 ### **`app/View/Components`**
 
@@ -589,6 +592,7 @@ class CategoryDropdown extends Component
 }
 ```
 
+##
 
 
 ### **`resources/views`**
