@@ -142,11 +142,8 @@ class DatabaseSeeder extends Seeder
     }
 }
 ```
-
-
-
-
-
+/
+/
 
 
 ## **`app/Models`**
