@@ -1,5 +1,180 @@
 ## Blog App
 
+**`database/migrations`**
+
+**database/migrations/*****_create_posts_table.php**
+```php
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration {
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('posts', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('category_id');
+            $table->string('slug')->unique();
+            $table->string('title');
+            $table->text('body');
+            $table->text('excerpt');
+            $table->string('thumbnail')->nullable();
+            $table->timestamps();
+            $table->timestamp('published_at')->nullable();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('posts');
+    }
+};
+```
+
+**database/migrations/*****_create_categories_table.php**
+```php
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('categories', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->unique();
+            $table->string('slug')->unique();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('categories');
+    }
+};
+```
+
+**database/migrations/*****_create_comments_table.php**
+```php
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration {
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('comments', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('post_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->text('body');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('comments');
+    }
+};
+```
+
+**database/seeders/DatabaseSeeder.php**
+```php
+<?php
+
+namespace Database\Seeders;
+
+
+use App\Models\Category;
+use Illuminate\Database\Seeder;
+
+class DatabaseSeeder extends Seeder
+{
+    /**
+     * Seed the application's database.
+     */
+    public function run(): void
+    {
+       
+
+        $personal = Category::create([
+            'name' => 'Personal',
+            'slug' => 'personal'
+        ]);
+        $family = Category::create([
+            'name' => 'Family',
+            'slug' => 'family'
+        ]);
+        $work = Category::create([
+            'name' => 'Work',
+            'slug' => 'work'
+        ]);
+
+        
+    }
+}
+```
+
+
+
+
+
+**`app/View/Components`**
+
+**app/View/Components/CategoryDropdown.php**
+```php
+<?php
+
+namespace App\View\Components;
+
+use App\Models\Category;
+use Closure;
+use Illuminate\Contracts\View\View;
+use Illuminate\View\Component;
+
+class CategoryDropdown extends Component
+{
+
+    /**
+     * Get the view / contents that represent the component.
+     */
+    public function render(): View|Closure|string
+    {
+        return view('components.category-dropdown', ['categories' => Category::all(),
+            'currentCategory' => Category::firstWhere('slug', request('category'))]);
+    }
+}
+```
+
+
 
 **`resources/views`**
 
@@ -692,6 +867,7 @@
     </section>
 </x-layout>
 ```
+
 
 
 
