@@ -4,7 +4,7 @@
 **`resources/views`**
 
 **resources/views/components/form/button.blade.php**
-```
+```php
 <button type="submit"
         class="bg-blue-500 text-white uppercase font-semibold text-xs py-2 px-10 rounded-2xl hover:bg-blue-600 mt-5">
     {{ $slot }}
@@ -13,7 +13,7 @@
 ```
 
 **resources/views/components/form/error.blade.php**
-```
+```php
 @props(['name'])
 
 @error($name)
@@ -22,14 +22,14 @@
 ```
 
 **resources/views/components/form/field.blade.php**
-```
+```php
 <div class="mt-6">
     {{ $slot }}
 </div>
 ```
 
 **resources/views/components/form/form-input.blade.php**
-```
+```php
 @props(['name'])
 <x-form.field>
     <x-form.label name="{{ $name }}"/>
@@ -41,14 +41,14 @@
 ```
 
 **resources/views/components/form/label.blade.php**
-```
+```php
 @props(['name'])
 
 <label for="{{ $name }}" class="block mb-2 uppercase font-bold text-xs text-gray-700">{{ ucwords($name) }}</label>
 ```
 
 **resources/views/components/form/textarea.blade.php**
-```
+```php
 @props(['name'])
 <x-form.field>
     <x-form.label name="{{ $name }}"/>
