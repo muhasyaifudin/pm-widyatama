@@ -1,6 +1,6 @@
 ## Blog App
 
-**`database/migrations`**
+### **`database/migrations`**
 
 **database/migrations/*****_create_posts_table.php**
 ```php
@@ -144,10 +144,424 @@ class DatabaseSeeder extends Seeder
 ```
 
 
+## **`app/Models`**
+
+**app/Models/Category.php**
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+class Category extends Model
+{
+    use HasFactory;
+
+    public function posts(): HasMany
+    {
+        return $this->hasMany(Post::class);
+    }
+}
+```
+
+**app/Models/Comment.php**
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Comment extends Model
+{
+    use HasFactory;
+
+    public function post()
+    {
+        return $this->belongsTo(Post::class);
+
+    }
+
+    public function author()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+}
+```
+
+**app/Models/Post.php**
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class Post extends Model
+{
+    use HasFactory;
+
+    protected $guarded = ['id'];
+    protected $with = ['category', 'author'];
+
+    public function scopeFilter($query, array $filters): void
+    {
+        $query->when($filters['search'] ?? false, fn($query, $search) => $query->where(fn($query) => $query
+            ->where('title', 'like', '%' . $search . '%')
+            ->orWhere('body', 'like', '%' . $search . '%')));
+
+        $query->when($filters['category'] ?? false, fn($query, $category) => $query
+            ->whereHas('category', fn($query) => $query->where('slug', $category))
+        );
+
+        $query->when($filters['author'] ?? false, fn($query, $author) => $query
+            ->whereHas('author', fn($query) => $query->where('username', $author))
+        );
+
+    }
+
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    public function author(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+}
+```
+
+**app/Models/User.php**
+```php
+<?php
+
+namespace App\Models;
+
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+
+class User extends Authenticatable
+{
+    use HasApiTokens, HasFactory, Notifiable;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $guarded = [];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
+
+    public function setPasswordAttribute($password): void
+    {
+        $this->attributes['password'] = bcrypt($password);
+    }
+
+    public function posts(): HasMany
+    {
+        return $this->hasMany(Post::class);
+    }
+}
+```
+
+
+### **`app/Http/Controllers`**
+
+**app/Http/Controllers/AdminPostController.php**
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Post;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+
+class AdminPostController extends Controller
+{
+    public function index()
+    {
+        return view('admin.posts.index', [
+            'posts' => Post::paginate(50)
+        ]);
+    }
+
+    public function edit(Post $post)
+    {
+        return view('admin.posts.edit', ['posts' => $post]);
+    }
+
+    public function update(Post $post)
+    {
+        $attribute = $this->validatePost($post);
+
+        if ($attribute['thumbnail'] ?? false) {
+            $attribute['thumbnail'] = request()->file('thumbnail')->store('thumbnail');
+        }
+
+        $post->update($attribute);
+        return back()->with('success', 'The Post Has Been Updated!');
+    }
+
+    protected function validatePost(?Post $post = null): array
+    {
+        $post ??= new Post();
+
+        return request()->validate([
+            'title' => 'required',
+            'slug' => ['required', Rule::unique('posts', 'slug')->ignore($post)],
+            'excerpt' => 'required',
+            'body' => 'required',
+            'thumbnail' => $post->exists() ? ['image'] : ['required', 'image'],
+            'category_id' => ['required', Rule::exists('categories', 'id')]
+        ]);
+    }
+
+    public function store()
+    {
+        $attribute = $this->validatePost(new Post());
+        $attribute['user_id'] = auth()->id();
+        $attribute['thumbnail'] = request()->file('thumbnail')->store('thumbnails');
+
+        Post::create($attribute);
+
+        return redirect('/');
+    }
+
+    public function create(Post $post)
+    {
+        return view('admin.posts.create');
+    }
+
+    public function destory(Post $post)
+    {
+        $post->delete();
+
+        return back()->with('success', 'The Post Has Been Deleted!');
+
+    }
+}
+```
+
+**app/Http/Controllers/PostCommentsController.php**
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Post;
+use Illuminate\Http\Request;
+
+class PostCommentsController extends Controller
+{
+    public function store(Post $post): \Illuminate\Http\RedirectResponse
+    {
+        request()->validate([
+            'body' => 'required'
+        ]);
+
+        $post->comments()->create([
+            'user_id' => request()->user()->id,
+            'body' => request('body')
+        ]);
+        return back();
+    }
+}
+```
+
+
+**app/Http/Controllers/PostController.php**
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Category;
+use App\Models\Post;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+
+class PostController extends Controller
+{
+    public function index()
+    {
+        return view('posts.index', [
+            'posts' => Post::latest()->filter(request(['search', 'category', 'author']))->paginate(6)->withQueryString(),
+            'currentCategory' => Category::firstWhere('slug', request('category'))
+        ]);
+    }
+
+    public function show(Post $post)
+    {
+        return view('posts.show', [
+            'post' => $post
+        ]);
+    }
+}
+```
+
+**app/Http/Controllers/RegisterController.php**
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\User;
+use Illuminate\Http\Request;
+
+class RegisterController extends Controller
+{
+    public function store()
+    {
+
+        $attributes = request()->validate([
+            'name' => ['required', 'max:255'],
+            'username' => ['required', 'max:255', 'min:3', 'unique:users,username'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'password' => ['required', 'max:255', 'min:7']
+        ]);
+
+        $user = User::create($attributes);
+        
+        auth()->login($user);
+
+        return redirect('/')->with('success', 'Your Account has been created.');
+    }
+
+    public function create()
+    {
+        return view('register.create');
+    }
+
+
+}
+```
+
+
+**app/Http/Controllers/SessionsController.php**
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Validation\ValidationException;
+
+class SessionsController extends Controller
+{
+    public function create()
+    {
+        return view('sessions.create');
+    }
+
+    public function store()
+    {
+        $attributes = request()->validate([
+            'email' => ['required', 'email'],
+            'password' => 'required'
+        ]);
+
+        if (auth()->attempt($attributes)) {
+            throw ValidationException::withMessages(['email' => 'Your Provided Credentials Could Not Be Verified']);
+        }
+
+        session()->regenerate();
+
+        return redirect('/')->with('success', 'Welcome Back!');
+    }
+
+    public function destroy()
+    {
+        auth()->logout();
+
+        return redirect('/')->with('success', 'Goodbye!');
+    }
+}
+```
+
+
+### **`routes`**
+
+**routes/web.php**
+```php
+<?php /** @noinspection ALL */
+
+use App\Http\Controllers\AdminPostController;
+use App\Http\Controllers\NewsletterController;
+use App\Http\Controllers\PostCommentsController;
+use App\Http\Controllers\SessionsController;
+use App\Models\Post;
+use App\Models\User;
+use App\Models\Category;
+use App\Services\Newsletter;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\RegisterController;
+
+
+Route::get('/', [PostController::class, 'index'])->name('home');
+
+Route::get('posts/{post:slug}', [PostController::class, 'show']);
+Route::post('posts/{post:slug}/comments', [PostCommentsController::class, 'store']);
+
+Route::post('newsletter', NewsletterController::class);
+
+Route::get('register', [RegisterController::class, 'create'])->middleware('guest');
+Route::post('register', [RegisterController::class, 'store'])->middleware('guest');
+
+Route::get('login', [SessionsController::class, 'create'])->middleware('guest');
+Route::post('login', [SessionsController::class, 'store'])->middleware('guest');
+
+Route::post('logout', [SessionsController::class, 'destroy'])->middleware('auth');
 
 
 
-**`app/View/Components`**
+    Route::get('/admin/posts', [AdminPostController::class, 'index']);
+    Route::get('/admin/posts/{post}/edit', [AdminPostController::class, 'edit']);
+    Route::get('/admin/posts/create/', [AdminPostController::class, 'create']);
+    Route::post('/admin/posts', [AdminPostController::class, 'store']);
+    Route::patch('/admin/posts/{post}', [AdminPostController::class, 'update']);
+    Route::delete('/admin/posts/{post}', [AdminPostController::class, 'destory']);
+
+
+```
+
+
+### **`app/View/Components`**
 
 **app/View/Components/CategoryDropdown.php**
 ```php
@@ -176,7 +590,7 @@ class CategoryDropdown extends Component
 
 
 
-**`resources/views`**
+### **`resources/views`**
 
 **resources/views/components/form/button.blade.php**
 ```html
