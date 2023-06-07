@@ -142,11 +142,10 @@ class DatabaseSeeder extends Seeder
     }
 }
 ```
-/
-/
 
+##
 
-## **`app/Models`**
+### **`app/Models`**
 
 **app/Models/Category.php**
 ```php
