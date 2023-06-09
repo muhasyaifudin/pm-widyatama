@@ -1044,6 +1044,129 @@ class CategoryDropdown extends Component
 </button>
 ```
 
+**resources/views/admin/posts/index.blade.php**
+```html
+<x-layout>
+    <x-setting heading="Manage Posts">
+        <div class="flex flex-col">
+            <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+                    <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <tbody class="bg-white divide-y divide-gray-200">
+
+                            @foreach ($posts as $post)
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="text-sm font-medium text-gray-900">
+                                                <a href="/posts/{{ $post->slug }}">
+                                                    {{ $post->title }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <a href="/admin/posts/{{ $post->id }}/edit"
+                                           class="text-blue-500 hover:text-blue-600">Edit</a>
+                                    </td>
+
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <form method="POST" action="/admin/posts/{{ $post->id }}">
+                                            @csrf
+                                            @method('DELETE')
+
+                                            <button class="text-xs text-gray-400">Delete</button>
+                                        </form>
+                                    </td>
+                                    
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </x-setting>
+</x-layout>
+
+```
+
+**resources/views/admin/posts/edit.blade.php**
+```html
+<x-layout>
+    <x-setting :heading="'Edit A Post: ' . $posts->title">
+        <form action="/admin/posts/{{ $posts->id }}" method="post" enctype="multipart/form-data">
+            @csrf
+            @method('PATCH')
+
+            <x-form.form-input name="title" :value="old('title', $posts->title)"/>
+            <x-form.form-input name="slug" :value="old('$this->slug', $posts->slug)"/>
+            <x-form.textarea name="excerpt">{{ old('body', $posts->excerpt) }}</x-form.textarea>
+            <x-form.textarea name="body">{{ old('body', $posts->body) }}</x-form.textarea>
+            <div class="flex mt-6 ">
+                <div class="flex-1">
+                    <x-form.form-input name="thumbnail" type="file" :value="old('thumbnail', $posts->thumbnail)"/>
+                </div>
+
+                <img src="{{ asset('storage/' . $posts->thumbnail) }}" alt="" width="100" class="rounded-xl ml-6">
+            </div>
+
+            <x-form.field>
+                <x-form.label name="category"/>
+                <select name="category_id" id="category_id" required>
+                    @foreach( \App\Models\Category::all() as $category)
+                        <option
+                            value="{{ $category->id }}"
+                            {{ old('category_id', $posts->category_id) == $category->id ? 'selected' : '' }}
+                        >{{ ucwords($category->name) }}</option>
+                    @endforeach
+                </select>
+                <x-form.error name="category"/>
+            </x-form.field>
+
+
+            <x-form.button>Update</x-form.button>
+        </form>
+    </x-setting>
+</x-layout>
+```
+
+**resources/views/admin/posts/create.blade.php**
+```html
+<x-layout>
+    <x-setting heading="Publish A New Post">
+        <form action="/admin/posts" method="post" enctype="multipart/form-data">
+            @csrf
+
+            <x-form.form-input name="title"/>
+            <x-form.textarea name="excerpt"/>
+            <x-form.textarea name="body"/>
+            <x-form.form-input name="thumbnail" type="file"/>
+
+
+            <x-form.field>
+                <x-form.label name="category"/>
+                <select name="category_id" id="category_id" required>
+                    @foreach( \App\Models\Category::all() as $category)
+                        <option
+                            value="{{ $category->id }}"
+                            {{ old('category_id') == $category->id ? 'selected' : '' }}
+                        >{{ ucwords($category->name) }}</option>
+                    @endforeach
+                </select>
+                <x-form.error name="category"/>
+            </x-form.field>
+
+
+            <x-form.button>Publish</x-form.button>
+        </form>
+    </x-setting>
+</x-layout>
+```
+
 **resources/views/posts/_add-comment-from.blade.php**
 ```html
 @auth()
